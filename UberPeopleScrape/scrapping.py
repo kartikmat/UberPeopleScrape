@@ -1,7 +1,15 @@
 import requests
 import csv
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
+
+session = requests.Session()
+retry = Retry(connect=3, backoff_factor=0.5)
+adapter = HTTPAdapter(max_retries=retry)
+session.mount('http://', adapter)
+session.mount('https://', adapter)
 
 class Entry(object):
     def __init__(self, fn, tn, ti, aot, tr, tv, ts, aom, ai, mt, mi, jd, m, rs, p, b, l, d, g, o):
@@ -35,9 +43,11 @@ class Entries(object):
         self.EntryList.append(e)
 
 
+
+
 def processThread(link, threadNum, employee_writer):
     print(link)
-    response = requests.get(
+    response = session.get(
         link, verify=True)
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -133,7 +143,7 @@ def processThread(link, threadNum, employee_writer):
 
         memberLink = "https://uberpeople.net/" + userProfile['href']
 
-        member_response = requests.get(
+        member_response = session.get(
             memberLink, verify=True)
 
         member_soup = BeautifulSoup(member_response.text, 'html.parser')
@@ -169,7 +179,7 @@ def processThread(link, threadNum, employee_writer):
 
             # Driving
             aboutLink = memberLink + "/about"
-            about_response = requests.get(
+            about_response = session.get(
                 aboutLink, verify=True)
 
             about_soup = BeautifulSoup(about_response.text, 'html.parser')
@@ -216,7 +226,7 @@ def processThread(link, threadNum, employee_writer):
 
 
 def processPage(pageLink, employee_writer):
-    allAdviceThreadsRequest = requests.get(
+    allAdviceThreadsRequest = session.get(
         pageLink, verify=True)
 
     AdviceSoup = BeautifulSoup(allAdviceThreadsRequest.text, 'html.parser')
@@ -256,6 +266,8 @@ def processPage(pageLink, employee_writer):
 
 
 def main():
+
+
     with open('employee_file.csv', mode='a', encoding="utf-8", newline='') as employee_file:
         employee_writer = csv.writer(
             employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
