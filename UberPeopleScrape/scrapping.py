@@ -112,8 +112,13 @@ def processThread(link, threadNum, employee_writer):
         ti = thread_id
         aot = thread_author
 
-        timestamp = listofMessages[i].find('time')['title']
-        ts = timestamp
+        if listofMessages[i].find('time') is not None:
+            timestamp = listofMessages[i].find('time')['title']
+            ts = timestamp
+
+        else:
+            timestamp = ""
+            ts = timestamp
 
         author_of_message = listofMessages[i].find("a").find('img')
         aom = author_of_message
@@ -277,10 +282,13 @@ def main():
              'Author_ID', 'Message_Text', 'Message_ID', 'Joined_Date',
              'Messages', 'Reaction_Score', 'Points', 'Birthday', 'Location', 'Driving',
              'Gender', 'Occupation'])
-        for i in range(50):
+
+        i = 0
+        while i in range(647):
             print("Page " + str(i + 1))
             pageLink = "https://uberpeople.net/forums/Tips/" + "page-" + str(i + 1)
             processPage(pageLink, employee_writer)
+            i = i + 1
 
 
 main()
